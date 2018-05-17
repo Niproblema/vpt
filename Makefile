@@ -41,7 +41,7 @@ $(DST_DIR)/%.html: $(SRC_DIR)/%.html
 
 $(OUTPUT_JS): $(INPUT_JS)
 	@echo "Building $@"
-	@cat $^ | tr -s '[:blank:]' ' ' | tr -s '\n' > $@
+	@cat $^ | tr -s '[:blank:]' ' ' | tr -s '\n'> $@
 
 $(OUTPUT_CSS): $(INPUT_CSS)
 	@echo "Building $@"

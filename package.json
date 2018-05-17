@@ -17,6 +17,6 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/terier/vpt#readme",
   "dependencies": {
-    "express": "latest"
+    "express": "^4.16.3"
   }
 }

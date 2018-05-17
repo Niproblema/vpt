@@ -38,7 +38,7 @@ while (Object.keys(dependencies).length > 0) {
 
     // Pick first standalone file, output it, and remove it from the graph
     var next = standalones[0];
-    console.log(next);
+    console.log(next.replace(/\\/g,"/"));
     delete dependencies[next];
     for (key in dependencies) {
         dependencies[key] = dependencies[key].filter(x => x !== next);
