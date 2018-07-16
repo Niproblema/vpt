@@ -20,7 +20,7 @@ var _ = Class.prototype;
 // ========================== CLASS DECLARATION ============================ //
 
 function RenderingContext(options) {
-    $.extend(this, Class.defaults, options);
+    CommonUtils.extend(this, Class.defaults, options);
 
     this._render = this._render.bind(this);
     this._webglcontextlostHandler = this._webglcontextlostHandler.bind(this);
@@ -178,14 +178,14 @@ _._destroyGL = function() {
     this._nullifyGL();
 };
 
-_._webglcontextlostHandler = function() {
+_._webglcontextlostHandler = function(e) {
     if (this._contextRestorable) {
         e.preventDefault();
     }
     this._nullifyGL();
 };
 
-_._webglcontextrestoredHandler = function() {
+_._webglcontextrestoredHandler = function(e) {
     this._initGL();
 };
 
@@ -228,6 +228,26 @@ _.setEnvironmentMap = function(image) {
         image.width, image.height,
         0, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
+_.chooseRenderer = function(renderer) {
+    this._renderer.destroy();
+    switch (renderer) {
+        case 'MIP':
+            this._renderer = new MIPRenderer(this._gl, this._volumeTexture, this._environmentTexture);
+            break;
+        case 'ISO':
+            this._renderer = new ISORenderer(this._gl, this._volumeTexture, this._environmentTexture);
+            break;
+        case 'EAM':
+            this._renderer = new EAMRenderer(this._gl, this._volumeTexture, this._environmentTexture);
+            break;
+        case 'MCS':
+            this._renderer = new MCSRenderer(this._gl, this._volumeTexture, this._environmentTexture);
+            break;
+    }
+    this._toneMapper.setTexture(this._renderer.getTexture());
+    this._isTransformationDirty = true;
 };
 
 _.getCanvas = function() {

@@ -1,4 +1,4 @@
-//@@../Util.js
+//@@../utils/Utils.js
 //@@../WebGLUtils.js
 //@@AbstractRenderer.js
 
@@ -6,14 +6,14 @@
 'use strict';
 
 var Class = global.MCSRenderer = MCSRenderer;
-Util.inherit(Class, AbstractRenderer);
+CommonUtils.inherit(Class, AbstractRenderer);
 var _ = Class.prototype;
 
 // ========================== CLASS DECLARATION ============================ //
 
 function MCSRenderer(gl, volumeTexture, environmentTexture, options) {
     _.sup.constructor.call(this, gl, volumeTexture, environmentTexture, options);
-    $.extend(true, this, Class.defaults, options);
+    CommonUtils.extend(this, Class.defaults, options);
 
     _._init.call(this);
 };
@@ -71,9 +71,9 @@ _.destroy = function() {
     _.sup.destroy.call(this);
 
     var gl = this._gl;
-    this._programs.forEach(function(program) {
-        gl.deleteProgram(program.program);
-    });
+    Object.keys(this._programs).forEach(function(programName) {
+        gl.deleteProgram(this._programs[programName].program);
+    }.bind(this));
 
     gl.deleteTexture(this._randomTexture);
 
@@ -146,7 +146,7 @@ _._integrateFrame = function() {
 
     gl.uniform1i(program.uniforms.uAccumulator, 0);
     gl.uniform1i(program.uniforms.uFrame, 1);
-    gl.uniform1f(program.uniforms.uFrameNumber, this._frameNumber);
+    gl.uniform1f(program.uniforms.uInvFrameNumber, 1 / this._frameNumber);
 
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 
@@ -175,7 +175,7 @@ _._getFrameBufferOptions = function() {
         min            : gl.NEAREST,
         mag            : gl.NEAREST,
         format         : gl.RGBA,
-        internalFormat : gl.RGBA16F,
+        internalFormat : gl.RGBA32F,
         type           : gl.FLOAT
     };
 };
@@ -188,7 +188,7 @@ _._getAccumulationBufferOptions = function() {
         min            : gl.NEAREST,
         mag            : gl.NEAREST,
         format         : gl.RGBA,
-        internalFormat : gl.RGBA16F,
+        internalFormat : gl.RGBA32F,
         type           : gl.FLOAT
     };
 };

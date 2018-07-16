@@ -20,7 +20,7 @@ var _ = Class.prototype;
 // ========================== CLASS DECLARATION ============================ //
 
 function Application(options) {
-    $.extend(this, Class.defaults, options);
+    CommonUtils.extend(this, Class.defaults, options);
 
     _._init.call(this);
 };
@@ -32,7 +32,7 @@ Class.defaults = {
 
 _._nullify = function() {
     this._renderingContext         = null;
-    this._$canvas                  = null;
+    this._canvas                   = null;
     this._navbar                   = null;
     this._openFileDialog           = null;
     this._openEnvironmentMapDialog = null;
@@ -49,16 +49,16 @@ _._init = function() {
     _._nullify.call(this);
 
     this._renderingContext = new RenderingContext();
-    this._$canvas = $(this._renderingContext.getCanvas());
-    this._$canvas.addClass('renderer');
-    $(document.body).append(this._$canvas);
+    this._canvas = this._renderingContext.getCanvas();
+    this._canvas.className += 'renderer';
+    document.body.appendChild(this._canvas);
 
-    $(window).resize(function() {
+    window.addEventListener('resize', function() {
         var width = window.innerWidth;
         var height = window.innerHeight;
         this._renderingContext.resize(width, height);
     }.bind(this));
-    $(window).resize();
+    CommonUtils.trigger('resize', window);
 
     this._openFileDialog = new OpenFileDialog(
         document.body, {
@@ -144,6 +144,38 @@ _._init = function() {
         }.bind(this),
         onRangeToneMapperDialog: function() {
             this._rangeToneMapperDialog.show();
+        }.bind(this),
+        onChooseMipRenderer: function() {
+            this._renderingContext.chooseRenderer('MIP');
+            this._mipRendererDialog.destroy();
+            this._mipRendererDialog = new MIPRendererDialog(
+                document.body,
+                this._renderingContext.getRenderer(), {
+            });
+        }.bind(this),
+        onChooseIsoRenderer: function() {
+            this._renderingContext.chooseRenderer('ISO');
+            this._isoRendererDialog.destroy();
+            this._isoRendererDialog = new ISORendererDialog(
+                document.body,
+                this._renderingContext.getRenderer(), {
+            });
+        }.bind(this),
+        onChooseEamRenderer: function() {
+            this._renderingContext.chooseRenderer('EAM');
+            this._eamRendererDialog.destroy();
+            this._eamRendererDialog = new EAMRendererDialog(
+                document.body,
+                this._renderingContext.getRenderer(), {
+            });
+        }.bind(this),
+        onChooseMcsRenderer: function() {
+            this._renderingContext.chooseRenderer('MCS');
+            this._mcsRendererDialog.destroy();
+            this._mcsRendererDialog = new MCSRendererDialog(
+                document.body,
+                this._renderingContext.getRenderer(), {
+            });
         }.bind(this)
     });
 
@@ -161,7 +193,7 @@ _.destroy = function() {
     this._mcsRendererDialog.destroy();
     this._reinhardToneMapperDialog.destroy();
     this._rangeToneMapperDialog.destroy();
-    this._$canvas.remove();
+    DOMUtils.remove(this._canvas);
 
     _._nullify.call(this);
 };

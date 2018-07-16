@@ -1,4 +1,4 @@
-//@@../Util.js
+//@@../utils/Utils.js
 //@@../WebGLUtils.js
 
 (function(global) {
@@ -10,7 +10,7 @@ var _ = Class.prototype;
 // ========================== CLASS DECLARATION ============================ //
 
 function AbstractToneMapper(gl, texture, options) {
-    $.extend(this, Class.defaults, options);
+    CommonUtils.extend(this, Class.defaults, options);
 
     this._gl = gl;
     this._texture = texture;
@@ -63,12 +63,16 @@ _.render = function() {
     this._renderFrame();
 };
 
+_.setTexture = function(texture) {
+    this._texture = texture;
+};
+
 _.getTexture = function() {
     return this._renderBuffer.getTexture();
 };
 
 _._renderFrame = function() {
-    throw Util.noimpl;
+    throw CommonUtils.noimpl;
 };
 
 _._getRenderBufferOptions = function() {

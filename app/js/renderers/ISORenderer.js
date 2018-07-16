@@ -1,4 +1,4 @@
-//@@../Util.js
+//@@../utils/Utils.js
 //@@../WebGLUtils.js
 //@@AbstractRenderer.js
 
@@ -6,14 +6,14 @@
 'use strict';
 
 var Class = global.ISORenderer = ISORenderer;
-Util.inherit(Class, AbstractRenderer);
+CommonUtils.inherit(Class, AbstractRenderer);
 var _ = Class.prototype;
 
 // ========================== CLASS DECLARATION ============================ //
 
 function ISORenderer(gl, volumeTexture, environmentTexture, options) {
     _.sup.constructor.call(this, gl, volumeTexture, environmentTexture, options);
-    $.extend(this, Class.defaults, options);
+    CommonUtils.extend(this, Class.defaults, options);
 
     _._init.call(this);
 };
@@ -46,9 +46,9 @@ _.destroy = function() {
     _.sup.destroy.call(this);
 
     var gl = this._gl;
-    this._programs.forEach(function(program) {
-        gl.deleteProgram(program.program);
-    });
+    Object.keys(this._programs).forEach(function(programName) {
+        gl.deleteProgram(this._programs[programName].program);
+    }.bind(this));
 
     _._nullify.call(this);
 };
