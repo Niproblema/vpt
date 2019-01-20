@@ -128,6 +128,7 @@ precision mediump float;
 uniform mediump sampler2D uAccumulator;
 uniform vec3 uLight;
 uniform vec3 uDiffuse;
+uniform bool uBackground;
 
 in vec2 vPosition;
 out vec4 oColor;
@@ -143,7 +144,7 @@ void main() {
         float lambert = max(dot(normal, light), 0.0);
         oColor = vec4(uDiffuse * lambert, 1.0);
     } else {
-        oColor = vec4(1.0);
+        oColor = vec4(uBackground);
     }
 }
 

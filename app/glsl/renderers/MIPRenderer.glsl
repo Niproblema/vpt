@@ -103,13 +103,20 @@ void main() {
 precision mediump float;
 
 uniform mediump sampler2D uAccumulator;
+uniform bool uBackground;
 
 in vec2 vPosition;
 out vec4 oColor;
 
 void main() {
     float acc = texture(uAccumulator, vPosition).r;
-    oColor = vec4(acc, acc, acc, 1.0);
+    vec4 col;
+    if(uBackground){
+        col = vec4(acc, acc, acc, 1.0);
+    }else{
+        col = vec4(1.0-acc, 1.0-acc, 1.0-acc, acc);
+    }
+    oColor = col;
 }
 
 %%MIPReset:vertex

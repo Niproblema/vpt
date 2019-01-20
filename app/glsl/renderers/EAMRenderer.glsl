@@ -26,6 +26,7 @@ uniform mediump sampler2D uTransferFunction;
 uniform float uStepSize;
 uniform float uOffset;
 uniform float uAlphaCorrection;
+uniform bool uBackground;
 
 in vec3 vRayFrom;
 in vec3 vRayTo;
@@ -37,7 +38,7 @@ void main() {
     vec3 rayDirection = vRayTo - vRayFrom;
     vec2 tbounds = max(intersectCube(vRayFrom, rayDirection), 0.0);
     if (tbounds.x >= tbounds.y) {
-        oColor = vec4(0.0, 0.0, 0.0, 1.0);
+         oColor = vec4(0.0, 0.0, 0.0, float(uBackground));
     } else {
         vec3 from = mix(vRayFrom, vRayTo, tbounds.x);
         vec3 to = mix(vRayFrom, vRayTo, tbounds.y);
@@ -61,7 +62,11 @@ void main() {
             t += uStepSize;
         } while (t < 1.0 && accumulatedAlpha < 0.99);
 
-        oColor = vec4(accumulatedColor.rgb, 1.0);
+        if(uBackground){
+            oColor = vec4(accumulatedColor.rgb, 1.0);
+        }else{
+            oColor = accumulatedColor;
+        }
     }
 }
 

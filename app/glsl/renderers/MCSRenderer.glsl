@@ -32,6 +32,7 @@ uniform float uOffset;
 uniform float uSigmaMax;
 uniform float uAlphaCorrection;
 uniform vec3 uScatteringDirection;
+uniform bool uBackground;
 
 in vec3 vRayFrom;
 in vec3 vRayTo;
@@ -114,7 +115,11 @@ void main() {
     vec3 rayDirectionUnit = normalize(rayDirection);
     vec2 tbounds = max(intersectCube(vRayFrom, rayDirection), 0.0);
     if (tbounds.x >= tbounds.y) {
-        oColor = sampleEnvironmentMap(rayDirectionUnit);
+        if(uBackground){
+            oColor = sampleEnvironmentMap(rayDirectionUnit);
+        } else {
+            oColor = vec4(0.0);
+        }
     } else {
         vec3 from = mix(vRayFrom, vRayTo, tbounds.x);
         vec3 to = mix(vRayFrom, vRayTo, tbounds.y);
@@ -124,7 +129,11 @@ void main() {
         float distance = sampleDistance(from, to, seed);
 
         if (distance > maxDistance) {
-            oColor = sampleEnvironmentMap(rayDirectionUnit);
+            if(uBackground){
+                oColor = sampleEnvironmentMap(rayDirectionUnit);
+            } else {
+                oColor = vec4(0.0);
+            }
         } else {
             from = mix(from, to, distance / maxDistance);
             tbounds = max(intersectCube(from, uScatteringDirection), 0.0);

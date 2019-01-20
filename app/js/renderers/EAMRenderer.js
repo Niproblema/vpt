@@ -76,10 +76,10 @@ _._generateFrame = function() {
     gl.uniform1i(program.uniforms.uVolume, 0);
     gl.uniform1i(program.uniforms.uTransferFunction, 1);
     gl.uniform1f(program.uniforms.uStepSize, this._stepSize);
-    gl.uniform1f(program.uniforms.uAlphaCorrection, this._alphaCorrection);
     gl.uniform1f(program.uniforms.uOffset, Math.random());
+    gl.uniform1f(program.uniforms.uAlphaCorrection, this._alphaCorrection);
+    gl.uniform1i(program.uniforms.uBackground, this._background);
     gl.uniformMatrix4fv(program.uniforms.uMvpInverseMatrix, false, this._mvpInverseMatrix.m);
-
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 };
 

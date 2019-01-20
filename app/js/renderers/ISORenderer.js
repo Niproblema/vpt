@@ -111,6 +111,7 @@ _._renderFrame = function() {
     gl.uniform1i(program.uniforms.uAccumulator, 0);
     gl.uniform3fv(program.uniforms.uLight, this._light);
     gl.uniform3fv(program.uniforms.uDiffuse, this._diffuse);
+    gl.uniform1i(program.uniforms.uBackground, this._background);
 
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 };

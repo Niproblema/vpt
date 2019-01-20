@@ -105,6 +105,7 @@ _._renderFrame = function() {
     gl.bindTexture(gl.TEXTURE_2D, this._accumulationBuffer.getTexture());
 
     gl.uniform1i(program.uniforms.uAccumulator, 0);
+    gl.uniform1i(program.uniforms.uBackground, this._background);
 
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 };
