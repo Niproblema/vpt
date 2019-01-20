@@ -64,19 +64,19 @@ vec4 sampleVolumeColor(vec3 position) {
     return transferSample;
 }
 
-float sampleDistance(vec3 from, vec3 to, vec2 seed) {
+float sampleDistance(vec3 from, vec3 to, inout vec2 seed) {
     float maxDistance = distance(from, to);
-    float distance = 0.0;
+    float dist = 0.0;
     float invSigmaMax = 1.0 / uSigmaMax;
+    float invMaxDistance = 1.0 / maxDistance;
 
     do {
         seed = rand(seed);
-        float stepLength = -log(1.0 - seed.x) * invSigmaMax;
-        distance += stepLength;
-        if (distance > maxDistance) {
+        dist -= log(1.0 - seed.x) * invSigmaMax;
+        if (dist > maxDistance) {
             break;
         }
-        vec3 samplingPosition = mix(from, to, distance / maxDistance);
+        vec3 samplingPosition = mix(from, to, dist * invMaxDistance);
         vec4 transferSample = sampleVolumeColor(samplingPosition);
         float alphaSample = transferSample.a * uAlphaCorrection;
         if (seed.y < alphaSample * invSigmaMax) {
@@ -84,29 +84,28 @@ float sampleDistance(vec3 from, vec3 to, vec2 seed) {
         }
     } while (true);
 
-    return distance;
+    return dist;
 }
 
-float sampleTransmittance(vec3 from, vec3 to, vec2 seed) {
+float sampleTransmittance(vec3 from, vec3 to, inout vec2 seed) {
     float maxDistance = distance(from, to);
-    float distance = 0.0;
+    float dist = 0.0;
     float invSigmaMax = 1.0 / uSigmaMax;
-    float extinction = 0.0;
+    float invMaxDistance = 1.0 / maxDistance;
+    float transmittance = 1.0;
 
     do {
         seed = rand(seed);
-        float stepLength = -log(1.0 - seed.x) * invSigmaMax;
-        distance += stepLength;
-        if (distance > maxDistance) {
+        dist -= log(1.0 - seed.x) * invSigmaMax;
+        if (dist > maxDistance) {
             break;
         }
-        vec3 samplingPosition = mix(from, to, distance / maxDistance);
+        vec3 samplingPosition = mix(from, to, dist * invMaxDistance);
         vec4 transferSample = sampleVolumeColor(samplingPosition);
         float alphaSample = transferSample.a * uAlphaCorrection;
-        extinction += alphaSample;
+        transmittance *= 1.0 - alphaSample * invSigmaMax;
     } while (true);
 
-    float transmittance = exp(-extinction);
     return transmittance;
 }
 
@@ -114,6 +113,7 @@ void main() {
     vec3 rayDirection = vRayTo - vRayFrom;
     vec3 rayDirectionUnit = normalize(rayDirection);
     vec2 tbounds = max(intersectCube(vRayFrom, rayDirection), 0.0);
+
     if (tbounds.x >= tbounds.y) {
         if(uBackground){
             oColor = sampleEnvironmentMap(rayDirectionUnit);
@@ -126,21 +126,22 @@ void main() {
         float maxDistance = distance(from, to);
 
         vec2 seed = vPosition + rand(vec2(uOffset, uOffset));
-        float distance = sampleDistance(from, to, seed);
+        float dist = sampleDistance(from, to, seed);
 
-        if (distance > maxDistance) {
+        if (dist > maxDistance) {
             if(uBackground){
                 oColor = sampleEnvironmentMap(rayDirectionUnit);
             } else {
                 oColor = vec4(0.0);
             }
         } else {
-            from = mix(from, to, distance / maxDistance);
+            from = mix(from, to, dist / maxDistance);
             tbounds = max(intersectCube(from, uScatteringDirection), 0.0);
-            to = mix(from, from + uScatteringDirection, tbounds.y);
+            to = from + uScatteringDirection * tbounds.y;
             vec4 diffuseColor = sampleVolumeColor(from);
-            vec4 lightColor = sampleEnvironmentMap(normalize(uScatteringDirection));
+            vec4 lightColor = sampleEnvironmentMap(uScatteringDirection);
             float transmittance = sampleTransmittance(from, to, seed);
+
             oColor = diffuseColor * lightColor * transmittance;
         }
     }
