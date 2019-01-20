@@ -19,9 +19,6 @@ function MCSRenderer(gl, volumeTexture, environmentTexture, options) {
 };
 
 Class.defaults = {
-    _lightPosition   : [2, 2, 2],
-    _lightColor      : [1, 1, 1],
-    _lightSize       : 2,
     _sigmaMax        : 1,
     _alphaCorrection : 1,
 };
